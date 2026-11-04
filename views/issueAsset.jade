@@ -1,0 +1,74 @@
+extends adminLayout
+
+block content
+  // Page Header
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      h1.mb-1 Issue Asset
+      p.text-secondary.mb-0 Assign an available asset to an active employee.
+
+    a.btn.btn-outline-secondary.btn-back(href="/admin")
+      span(aria-hidden="true") ←
+      | Back to Dashboard
+
+  // Success Message
+  if success
+    .alert.alert-success.alert-dismissible.fade.show.border-0.shadow-sm.mb-4(role="alert")
+      .d-flex.align-items-center.gap-2
+        span.fs-5(aria-hidden="true") ✓
+        div
+          strong Asset issued successfully!
+          p.mb-0 The asset has been assigned successfully.
+      button.btn-close(type="button" data-bs-dismiss="alert" aria-label="Close")
+
+  // Issue Asset Form
+  .row.justify-content-center
+    .col-12.col-xl-9
+      .card.border-0.shadow-sm.issue-asset-card
+        .card-header.bg-white.border-bottom.p-4
+          .d-flex.align-items-center.gap-3
+            .issue-asset-icon
+              span(aria-hidden="true") 📦
+            div
+              h5.mb-1 Assign an Asset
+              p.text-secondary.mb-0 Select an available asset, employee, and issue date.
+
+        .card-body.p-4
+          form(method="POST" action="/transactions/issue")
+            // Asset Selection
+            .mb-4
+              label.form-label.fw-semibold(for="assetId") Available Asset
+                span.text-danger.ms-1 *
+              select#assetId.form-select(name="assetId" required)
+                option(value="") Select an available asset
+                each asset in assets
+                  option(value=asset.id) #{asset.assetCode} — #{asset.make} #{asset.model} (#{asset.branch})
+              .form-text Choose the asset you want to assign to an employee.
+
+            // Employee Selection
+            .mb-4
+              label.form-label.fw-semibold(for="employeeId") Active Employee
+                span.text-danger.ms-1 *
+              select#employeeId.form-select(name="employeeId" required)
+                option(value="") Select an employee
+                each employee in employees
+                  option(value=employee.id) #{employee.employeeCode} — #{employee.firstName} #{employee.lastName}
+              .form-text Select the employee who will receive the asset.
+
+            // Issue Date
+            .mb-4
+              label.form-label.fw-semibold(for="issueDate") Issue Date
+                span.text-danger.ms-1 *
+              input#issueDate.form-control(
+                type="date"
+                name="issueDate"
+                required
+              )
+              .form-text Enter the date on which the asset is issued.
+
+            // Actions
+            .d-flex.flex-wrap.justify-content-end.gap-2.pt-3.border-top
+              a.btn.btn-light.btn-md.px-4(href="/transactions/issue") Cancel
+              button.btn.btn-primary.btn-md.px-4(type="submit")
+                span.me-2(aria-hidden="true") ✓
+                | Assign Asset

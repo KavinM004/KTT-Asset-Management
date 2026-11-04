@@ -1,0 +1,789 @@
+
+doctype html
+html
+  head
+    title= title || "Employee Dashboard"
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
+    // Bootstrap CSS
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css")
+
+    // DataTables Bootstrap CSS
+    link(rel="stylesheet", href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css")
+
+    // Custom CSS
+    link(rel="stylesheet", href="/css/style.css")
+
+    style.
+      :root {
+        --primary: #2ad2b2;
+        --primary-dark: #20b99c;
+        --dark: #2e2e2f;
+        --background: #f3f6f8;
+        --muted: #687477;
+        --border: #e7ecef;
+        --white: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        min-height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        background: var(--background);
+        color: var(--dark);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      /* Header */
+
+      .topbar {
+        position: relative;
+        z-index: 1000;
+        flex: 0 0 auto;
+        width: 100%;
+        min-height: 76px;
+        padding: 10px 5%;
+        background: linear-gradient(
+          110deg,
+          #2e2e2f 0%,
+          #287e70 55%,
+          #2ad2b2 100%
+        );
+        color: var(--white);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: nowrap;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.16);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .brand-logo {
+        display: block;
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        object-fit: contain;
+        border-radius: 6px;
+      }
+
+      .brand-text {
+        color: var(--primary);
+        line-height: 1.3;
+        white-space: nowrap;
+      }
+
+      .logout-form {
+        flex: 0 0 auto;
+        margin: 0;
+      }
+
+      .logout-btn {
+        padding: 9px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      /* Main content */
+
+      .dashboard-container {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 22px 24px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior-y: contain;
+        -webkit-overflow-scrolling: touch;
+
+        /* Hide vertical scrollbar but keep scrolling */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .dashboard-container::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+
+      /* Welcome section */
+
+      .welcome-section {
+        display: block;
+        height: auto !important;
+        min-height: 0 !important;
+        background: var(--white);
+        border-radius: 14px;
+        padding: 22px 26px;
+        margin: 0 0 18px;
+        border-left: 5px solid var(--primary);
+        box-shadow: 0 4px 16px rgba(28, 40, 45, 0.05);
+      }
+
+      .welcome-section h1 {
+        margin: 0 0 8px;
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--dark);
+      }
+
+      .welcome-section p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      /* Section cards */
+
+      .section-card {
+        display: block;
+        width: 100%;
+        height: auto !important;
+        min-height: 0 !important;
+        flex: 0 0 auto;
+        background: var(--white);
+        border: 1px solid rgba(231, 236, 239, 0.7);
+        border-radius: 14px;
+        padding: 22px;
+        margin: 0 0 18px;
+        box-shadow: 0 4px 16px rgba(28, 40, 45, 0.05);
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      .section-title {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--dark);
+      }
+
+      .section-description {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      /* Employee profile */
+
+      .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .profile-item {
+        min-width: 0;
+        padding: 15px;
+        border: 1px solid var(--border);
+        background: #f7f9fa;
+        border-radius: 10px;
+      }
+
+      .profile-label {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 7px;
+      }
+
+      .profile-value {
+        display: block;
+        color: var(--dark);
+        font-size: 14px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+      }
+
+      .employee-status {
+        display: inline-block;
+        padding: 5px 11px;
+        border-radius: 20px;
+        background: #d9f8f0;
+        color: #087d66;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      /* Tables */
+
+      .dashboard-table {
+        width: 100%;
+        min-width: 650px;
+        margin: 0;
+        border-collapse: collapse;
+      }
+
+      .dashboard-table thead th {
+        padding: 12px 14px;
+        background: var(--dark) !important;
+        color: var(--white) !important;
+        border: 1px solid #414143 !important;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .dashboard-table tbody td {
+        padding: 12px 14px;
+        color: #3e4649;
+        border: 1px solid var(--border);
+        font-size: 13px;
+        vertical-align: middle;
+        white-space: nowrap;
+      }
+
+      .dashboard-table tbody tr:nth-child(even) td {
+        background: #f8fafb;
+      }
+
+      .dashboard-table tbody tr:hover td {
+        background: #effbf8;
+      }
+
+      .asset-code {
+        color: #087d66;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .action-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        background: #d9f8f0;
+        color: #087d66;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      /* DataTables wrapper */
+
+      #issuedAssetsTable_wrapper,
+      #assetHistoryTable_wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      #issuedAssetsTable_wrapper .dt-layout-row,
+      #assetHistoryTable_wrapper .dt-layout-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+        margin: 10px 0;
+        overflow: visible;
+      }
+
+      #issuedAssetsTable_wrapper .dt-layout-cell,
+      #assetHistoryTable_wrapper .dt-layout-cell {
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      /* Search input */
+
+      #issuedAssetsTable_wrapper .dt-search input,
+      #assetHistoryTable_wrapper .dt-search input {
+        width: 125px;
+        height: 30px;
+        min-height: 30px;
+        padding: 5px 10px;
+        font-size: 13px;
+        border-radius: 7px;
+        box-sizing: border-box;
+      }
+
+      /* Entries dropdown */
+
+      #issuedAssetsTable_wrapper .dt-length select,
+      #assetHistoryTable_wrapper .dt-length select {
+        height: 26px !important;
+        min-height: 26px !important;
+        padding: 4px 26px 4px 10px !important;
+        font-size: 13px !important;
+        line-height: 1.4;
+        box-sizing: border-box;
+      }
+
+      /* DataTables text */
+
+      #issuedAssetsTable_wrapper .dt-info,
+      #assetHistoryTable_wrapper .dt-info {
+        font-size: 13px;
+      }
+
+      #issuedAssetsTable_wrapper .dt-paging,
+      #assetHistoryTable_wrapper .dt-paging {
+        font-size: 13px;
+      }
+
+      /* DataTables focus */
+
+      #issuedAssetsTable_wrapper .dt-search input:focus,
+      #assetHistoryTable_wrapper .dt-search input:focus,
+      #issuedAssetsTable_wrapper .dt-length select:focus,
+      #assetHistoryTable_wrapper .dt-length select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.15rem rgba(42, 210, 178, 0.18);
+        outline: none;
+      }
+
+      /* Horizontal scrolling - table body only */
+
+      #issuedAssetsTable_wrapper .dt-scroll,
+      #assetHistoryTable_wrapper .dt-scroll {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      #issuedAssetsTable_wrapper .dt-scroll-body,
+      #assetHistoryTable_wrapper .dt-scroll-body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch;
+
+        /* Hide horizontal scrollbar */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      #issuedAssetsTable_wrapper .dt-scroll-body::-webkit-scrollbar,
+      #assetHistoryTable_wrapper .dt-scroll-body::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+
+      /* Prevent the hidden header inside the scrolling body
+         from creating an extra visible header row */
+
+      #issuedAssetsTable_wrapper .dt-scroll-body thead,
+      #assetHistoryTable_wrapper .dt-scroll-body thead {
+        visibility: collapse;
+      }
+
+      /* Keep the visible DataTables header styled */
+
+      #issuedAssetsTable_wrapper .dt-scroll-head th,
+      #assetHistoryTable_wrapper .dt-scroll-head th {
+        background: var(--dark) !important;
+        color: var(--white) !important;
+        border: 1px solid #414143 !important;
+        white-space: nowrap;
+      }
+
+      /* Empty states */
+
+      .empty-state {
+        padding: 22px 18px;
+        text-align: center;
+        border: 1px dashed #d7e0e3;
+        border-radius: 10px;
+        background: #f8fafb;
+      }
+
+      .empty-state h3 {
+        margin: 0 0 7px;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .empty-state p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      /* Footer */
+
+      .footer {
+        flex: 0 0 auto;
+        padding: 11px 15px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+        background: var(--background);
+      }
+
+      .footer p {
+        margin: 0;
+      }
+
+      /* Tablet */
+
+      @media (max-width: 900px) {
+        .profile-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .dashboard-container {
+          padding: 20px 18px;
+        }
+      }
+
+      /* Mobile */
+
+      @media (max-width: 600px) {
+        .topbar {
+          min-height: 64px;
+          padding: 9px 12px;
+          gap: 8px;
+          flex-wrap: nowrap;
+        }
+
+        .brand {
+          flex: 1 1 auto;
+          gap: 8px;
+          font-size: 15px;
+        }
+
+        .brand-logo {
+          width: 38px;
+          height: 38px;
+        }
+
+        .brand-text {
+          font-size: 15px;
+          white-space: normal;
+          line-height: 1.2;
+        }
+
+        .logout-form {
+          flex: 0 0 auto;
+        }
+
+        .logout-btn {
+          padding: 7px 11px;
+          font-size: 12px;
+        }
+
+        .dashboard-container {
+          padding: 14px 10px;
+        }
+
+        .welcome-section {
+          padding: 17px;
+          margin-bottom: 14px;
+        }
+
+        .section-card {
+          padding: 16px;
+          margin-bottom: 14px;
+        }
+
+        .welcome-section h1 {
+          font-size: 21px;
+        }
+
+        .section-title {
+          font-size: 17px;
+        }
+
+        .section-heading {
+          margin-bottom: 13px;
+        }
+
+        .profile-grid {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .profile-item {
+          padding: 12px;
+        }
+
+        #issuedAssetsTable_wrapper .dt-layout-row,
+        #assetHistoryTable_wrapper .dt-layout-row {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+
+        #issuedAssetsTable_wrapper .dt-layout-cell,
+        #assetHistoryTable_wrapper .dt-layout-cell {
+          min-width: 0;
+          max-width: 100%;
+        }
+
+        #issuedAssetsTable_wrapper .dt-search,
+        #assetHistoryTable_wrapper .dt-search {
+          max-width: 100%;
+        }
+
+        #issuedAssetsTable_wrapper .dt-search input,
+        #assetHistoryTable_wrapper .dt-search input {
+          max-width: 125px;
+        }
+
+        .footer {
+          padding: 9px;
+          font-size: 12px;
+        }
+      }
+
+      /* Very narrow mobile screens */
+
+      @media (max-width: 360px) {
+        .topbar {
+          padding-left: 8px;
+          padding-right: 8px;
+        }
+
+        .brand {
+          gap: 6px;
+        }
+
+        .brand-logo {
+          width: 34px;
+          height: 34px;
+        }
+
+        .brand-text {
+          font-size: 13px;
+        }
+
+        .logout-btn {
+          padding: 6px 9px;
+          font-size: 11px;
+        }
+      }
+
+  body
+    header.topbar
+      h2.brand
+        img.brand-logo(src="/images/ktt_logo.jpg", alt="KTT Logo")
+        span.brand-text KTT Asset Management
+
+      form.logout-form(action="/logout", method="POST")
+        button.btn.btn-danger.logout-btn(type="submit") Logout
+
+    main.dashboard-container
+      section.welcome-section
+        if employee
+          h1 Welcome, #{employee.firstName}!
+        else
+          h1 Welcome, User!
+
+        p View your employee profile, assigned assets, and asset history in one place.
+
+      if message
+        .alert.alert-warning(role="alert")= message
+
+      if employee
+        // Employee Profile
+        section.section-card
+          .section-heading
+            div
+              h2.section-title My Employee Profile
+              p.section-description Your registered employee information.
+
+          .profile-grid
+            .profile-item
+              span.profile-label Employee Code
+              span.profile-value= employee.employeeCode
+
+            .profile-item
+              span.profile-label Full Name
+              span.profile-value #{employee.firstName} #{employee.lastName}
+
+            .profile-item
+              span.profile-label Email Address
+              span.profile-value= employee.email
+
+            .profile-item
+              span.profile-label Department
+              span.profile-value= employee.department || "Not assigned"
+
+            .profile-item
+              span.profile-label Employment Status
+              span.profile-value
+                span.employee-status= employee.status
+
+            .profile-item
+              span.profile-label Login Email
+              span.profile-value= user.email
+
+        // Currently Issued Assets
+        section.section-card
+          .section-heading
+            div
+              h2.section-title My Currently Issued Assets
+              p.section-description Assets currently assigned to you.
+
+          if issuedAssets && issuedAssets.length
+            table.table.dashboard-table#issuedAssetsTable
+              thead
+                tr
+                  th Asset Code
+                  th Category
+                  th Make
+                  th Model
+                  th Serial Number
+                  th Branch
+                  th Issue Date
+
+              tbody
+                each transaction in issuedAssets
+                  tr
+                    td.asset-code= transaction.Asset.assetCode
+                    td= transaction.Asset.AssetCategory ? transaction.Asset.AssetCategory.categoryName : "—"
+                    td= transaction.Asset.make
+                    td= transaction.Asset.model
+                    td= transaction.Asset.serialNumber
+                    td= transaction.Asset.branch
+                    td= transaction.issueDate
+          else
+            .empty-state
+              h3 No Assets Assigned
+              p You currently have no issued assets. Contact your administrator if you believe an asset should be assigned to you.
+
+        // Asset History
+        section.section-card
+          .section-heading
+            div
+              h2.section-title My Asset History
+              p.section-description View and track asset activity history.
+
+          if assetHistory && assetHistory.length
+            table.table.dashboard-table#assetHistoryTable
+              thead
+                tr
+                  th Asset Code
+                  th Make
+                  th Model
+                  th Action
+                  th Date
+                  th Reason
+
+              tbody
+                each history in assetHistory
+                  tr
+                    td.asset-code= history.Asset.assetCode
+                    td= history.Asset.make
+                    td= history.Asset.model
+                    td
+                      span.action-badge= history.action
+                    td= history.actionDate
+                    td= history.reason || "—"
+          else
+            .empty-state
+              h3 No Asset History
+              p No asset history records are available for your employee account yet.
+
+    footer.footer
+      p © KTT Asset Management System
+
+    // jQuery
+    script(src="https://code.jquery.com/jquery-3.7.1.min.js")
+
+    // DataTables JavaScript
+    script(src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js")
+    script(src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js")
+
+    // Initialize DataTables
+    script.
+      document.addEventListener("DOMContentLoaded", function () {
+
+        const issuedAssetsTable = document.querySelector("#issuedAssetsTable");
+
+        if (issuedAssetsTable) {
+          new DataTable("#issuedAssetsTable", {
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            searching: true,
+            ordering: true,
+            paging: true,
+            info: true,
+            scrollX: true,
+            autoWidth: false,
+            language: {
+              search: "Search:",
+              lengthMenu: "Show _MENU_ entries",
+              emptyTable: "No issued assets available",
+              zeroRecords: "No matching assets found",
+              info: "Showing _START_ to _END_ of _TOTAL_ entries",
+              infoEmpty: "Showing 0 to 0 of 0 entries"
+            }
+          });
+        }
+
+        const assetHistoryTable = document.querySelector("#assetHistoryTable");
+
+        if (assetHistoryTable) {
+          new DataTable("#assetHistoryTable", {
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            searching: true,
+            ordering: true,
+            paging: true,
+            info: true,
+            scrollX: true,
+            autoWidth: false,
+            language: {
+              search: "Search:",
+              lengthMenu: "Show _MENU_ entries",
+              emptyTable: "No asset history available",
+              zeroRecords: "No matching history found",
+              info: "Showing _START_ to _END_ of _TOTAL_ entries",
+              infoEmpty: "Showing 0 to 0 of 0 entries"
+            }
+          });
+        }
+
+      });
+
+      // Reload page when restored from browser back-forward cache
+      window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+          window.location.reload();
+        }
+      });

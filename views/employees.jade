@@ -1,0 +1,120 @@
+
+extends adminLayout
+
+block content
+
+  // Page Header
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      h1.mb-1 Employee Master
+      p.text-secondary.mb-0 View, search, and manage employee records.
+
+    .d-flex.flex-wrap.gap-2
+      a.btn.btn-outline-secondary.btn-back(href="/admin")
+        span(aria-hidden="true") ←
+        | Back to Dashboard
+
+      a.btn.btn-success.add-action-btn(href="/employees/add") + Add Employee
+
+  // Employee Search and Status Filter
+  .card.border-0.shadow-sm.mb-4
+    .card-body
+      form(action="/employees", method="GET")
+        .row.g-3.align-items-end
+          .col-12.col-md-5
+            label.form-label(for="search") Search Employees
+            input#search.form-control(
+              type="text"
+              name="search"
+              value=search
+              placeholder="Employee code, name, or email"
+            )
+
+          .col-12.col-md-4
+            label.form-label(for="status") Employee Status
+            select#status.form-select(name="status")
+              option(value="" selected=!status) All Employees
+              option(value="Active" selected=status === "Active") Active
+              option(value="Inactive" selected=status === "Inactive") Inactive
+
+          .col-12.col-md-3.d-flex.flex-wrap.gap-2
+            button.btn.btn-success(type="submit") Search
+            a.btn.btn-outline-secondary(href="/employees") Clear Filters
+
+  // Employee List
+  .card.border-0.shadow-sm
+    .card-header.bg-white.py-3
+      h5.mb-0 Employee List
+
+    .card-body.p-3
+      if employees.length === 0
+        .alert.alert-info.mb-0 No employees found.
+      else
+        // Employee DataTable
+        table#employeesTable.table.table-hover.table-striped.align-middle.mb-0.w-100
+          thead.table-dark
+            tr
+              th Employee Code
+              th Employee Name
+              th Email
+              th Department
+              th Status
+              th.text-center Actions
+
+          tbody
+            each employee in employees
+              tr
+                td.fw-semibold= employee.employeeCode
+                td= employee.firstName + " " + employee.lastName
+                td= employee.email
+                td= employee.department || "—"
+
+                td
+                  if employee.status === "Active"
+                    span.badge.text-bg-success Active
+                  else
+                    span.badge.text-bg-secondary Inactive
+
+                td.text-center
+                  a.btn.btn-sm.btn-outline-success(href="/employees/edit/" + employee.id) Edit
+
+  // DataTables Setup
+  if employees.length > 0
+    script.
+      $(document).ready(function () {
+        const table = document.getElementById("employeesTable");
+
+        if (table && !$.fn.DataTable.isDataTable(table)) {
+          $(table).DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            searching: true,
+            ordering: true,
+            paging: true,
+            info: true,
+            autoWidth: false,
+            scrollX: true,
+            order: [],
+
+            columnDefs: [
+              {
+                orderable: false,
+                targets: 5
+              }
+            ],
+
+            language: {
+              search: "Search employees:",
+              lengthMenu: "Show _MENU_ employees",
+              info: "Showing _START_ to _END_ of _TOTAL_ employees",
+              infoEmpty: "No employees available",
+              zeroRecords: "No matching employees found",
+
+              paginate: {
+                previous: "Previous",
+                next: "Next"
+              }
+            }
+          });
+        }
+      });

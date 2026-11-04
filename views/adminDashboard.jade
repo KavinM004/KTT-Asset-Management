@@ -1,0 +1,82 @@
+extends adminLayout
+
+block content
+  .page-heading.mb-4
+    h1 Dashboard
+
+  .row.g-3.mb-4
+    .col-12.col-sm-6.col-xl-3
+      .summary-card.employee-card
+        span.summary-icon 👥
+        h3 Employees
+        a.btn.btn-brand.mt-2(href="/employees") View Employees
+
+    .col-12.col-sm-6.col-xl-3
+      .summary-card.asset-card
+        span.summary-icon 💻
+        h3 Assets
+        a.btn.btn-brand.mt-2(href="/assets") View Assets
+
+    .col-12.col-sm-6.col-xl-3
+      .summary-card.stock-card
+        span.summary-icon 📦
+        h3 Stock View
+        a.btn.btn-brand.mt-2(href="/stock") View Stock
+
+    .col-12.col-sm-6.col-xl-3
+      .summary-card.reports-card
+        span.summary-icon 📊
+        h3 Reports
+        a.btn.btn-brand.mt-2(href="/reports") Open Reports
+
+  .row.g-4
+    .col-12.col-xl-6
+      .section-card
+        h4 Master Management
+        p.section-description Manage employees, assets, and asset categories.
+
+        a.module-link(href="/employees")
+          span Employees
+          span.module-arrow →
+
+        a.module-link(href="/assets")
+          span Assets
+          span.module-arrow →
+
+        a.module-link(href="/asset-categories")
+          span Asset Categories
+          span.module-arrow →
+
+        a.module-link(href="/stock")
+          span Stock View
+          span.module-arrow →
+
+    .col-12.col-xl-6
+      .section-card
+        h4 Asset Transactions
+        p.section-description Issue, return, and scrap company assets.
+
+        a.module-link(href="/transactions/issue")
+          span Issue Asset
+          span.module-arrow →
+
+        a.module-link(href="/transactions/return")
+          span Return Asset
+          span.module-arrow →
+
+        a.module-link(href="/transactions/scrap")
+          span Scrap Asset
+          span.module-arrow →
+
+    .col-12.col-xl-6
+      .section-card
+        h4 History and Reports
+        p.section-description Review asset movements and management reports.
+
+        a.module-link(href="/history")
+          span Asset History
+          span.module-arrow →
+
+        a.module-link(href="/reports")
+          span Reports
+          span.module-arrow →

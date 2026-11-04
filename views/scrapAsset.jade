@@ -1,0 +1,89 @@
+extends adminLayout
+
+block content
+  // Page Header
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      h1.mb-1 Scrap Asset
+      p.text-secondary.mb-0 Record assets that are obsolete, damaged, or no longer usable.
+
+    a.btn.btn-outline-secondary.btn-back(href="/admin")
+      span(aria-hidden="true") ←
+      | Back to Dashboard
+
+  // Success Message
+  if success
+    .alert.alert-success.alert-dismissible.fade.show.border-0.shadow-sm.mb-4(role="alert")
+      .d-flex.align-items-center.gap-2
+        span.fs-5(aria-hidden="true") ✓
+        div
+          strong Asset scrapped successfully.
+          p.mb-0 The asset scrap operation has been recorded.
+      button.btn-close(type="button" data-bs-dismiss="alert" aria-label="Close")
+
+  if assets.length === 0
+    // Empty State
+    .card.border-0.shadow-sm.scrap-asset-card
+      .card-body.text-center.py-5.px-3
+        .scrap-empty-icon.mb-3
+          span(aria-hidden="true") 📦
+        h5.mb-2 No Assets Available for Scrapping
+        p.text-secondary.mb-0 No available or under-repair assets can be scrapped.
+
+  else
+    // Scrap Asset Form
+    .row.justify-content-center
+      .col-12.col-xl-9
+        .card.border-0.shadow-sm.scrap-asset-card
+          .card-header.bg-white.border-bottom.p-4
+            .d-flex.align-items-center.gap-3
+              .scrap-asset-icon
+                span(aria-hidden="true") 🗑
+              div
+                h5.mb-1 Scrap Asset Details
+                p.text-secondary.mb-0 Select an asset and record the scrap information.
+
+          .card-body.p-4
+            form(method="POST" action="/transactions/scrap" onsubmit="return confirm('Are you sure you want to scrap this asset? This action may not be reversible.');")
+              // Asset Selection
+              .mb-4
+                label.form-label.fw-semibold(for="assetId") Select Asset
+                  span.text-danger.ms-1 *
+                select#assetId.form-select(name="assetId" required)
+                  option(value="") Select an asset
+                  each asset in assets
+                    option(value=asset.id) #{asset.assetCode} — #{asset.make} #{asset.model} (#{asset.status})
+                .form-text Choose the asset that needs to be scrapped.
+
+              // Scrap Date
+              .mb-4
+                label.form-label.fw-semibold(for="scrapDate") Scrap Date
+                  span.text-danger.ms-1 *
+                input#scrapDate.form-control(
+                  type="date"
+                  name="scrapDate"
+                  required
+                )
+                .form-text Enter the date on which the asset is scrapped.
+
+              // Scrap Reason
+              .mb-4
+                label.form-label.fw-semibold(for="scrapReason") Scrap Reason
+                  span.text-danger.ms-1 *
+                textarea#scrapReason.form-control(
+                  name="scrapReason"
+                  rows="4"
+                  required
+                  maxlength="500"
+                  placeholder="Enter the reason for scrapping this asset"
+                )
+                .d-flex.justify-content-between.align-items-center.mt-1
+                  small.text-secondary Explain why the asset can no longer be used.
+                  small.text-secondary Maximum 500 characters.
+
+              // Actions
+              .d-flex.flex-wrap.justify-content-end.gap-2.pt-3.border-top
+                a.btn.btn-light.px-4(href="/admin") Cancel
+                button.btn.btn-danger.px-4(type="submit")
+                  span.me-2(aria-hidden="true") 🗑
+                  | Scrap Asset

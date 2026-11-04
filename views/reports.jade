@@ -1,0 +1,202 @@
+
+extends adminLayout
+
+block content
+  // Page Header
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      h1.mb-1 Asset Management Reports
+      p.text-secondary.mb-0 Summary of assets, branches, employees, and scrap records.
+
+    a.btn.btn-outline-secondary.btn-back(href="/admin")
+      span(aria-hidden="true") ←
+      | Back to Dashboard
+
+  // Asset Summary
+  h5.mb-3 Asset Summary
+
+  - const statuses = ["Available", "Issued", "Under Repair", "Scrapped"]
+
+  .row.g-3.mb-4
+    each status in statuses
+      - const record = statusCounts.find(item => item.status === status)
+
+      .col-12.col-sm-6.col-xl-3
+        .card.border-0.shadow-sm.report-summary-card.h-100
+          .card-body.p-4
+            .d-flex.justify-content-between.align-items-center.gap-3
+              div
+                p.text-secondary.mb-2= status
+                h2.mb-0.report-summary-number= record ? record.count : 0
+
+              .report-summary-icon(
+                class=status === "Available" ? "report-icon-available" : status === "Issued" ? "report-icon-issued" : status === "Under Repair" ? "report-icon-repair" : "report-icon-scrapped"
+              )
+                span(aria-hidden="true")= status === "Available" ? "✓" : status === "Issued" ? "↗" : status === "Under Repair" ? "🔧" : "!"
+
+  // Branch-wise Stock Report
+  .card.border-0.shadow-sm.report-table-card.mb-4
+    .card-header.bg-white.border-bottom.p-4
+      .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2
+        div
+          h5.mb-1 Branch-wise Stock Report
+          p.text-secondary.mb-0 Asset quantities and purchase value grouped by branch.
+
+        span.badge.rounded-pill.text-bg-light.border.report-count-label
+          | Branches: #{branchReports.length}
+
+    .card-body.p-3
+      if branchReports.length === 0
+        .text-center.py-5.px-3
+          h6.mb-2 No Branch Data Available
+          p.text-secondary.mb-0 Branch report records will appear here when available.
+
+      else
+        table#branchReportsTable.table.table-hover.align-middle.mb-0.w-100(style="min-width: 800px;")
+          thead
+            tr
+              th.px-4.py-3(scope="col") Branch
+              th.py-3.text-center(scope="col") Asset Quantity
+              th.py-3.text-end.pe-4(scope="col") Total Purchase Value
+
+          tbody
+            each branch in branchReports
+              tr
+                td.px-4
+                  strong= branch.branch
+
+                td.text-center
+                  span.badge.report-quantity-badge= branch.totalAssets
+
+                td.text-end.pe-4.fw-semibold= Number(branch.totalPurchaseValue || 0).toLocaleString("en-IN", { style: "currency", currency: "INR" })
+
+  // Employee Asset Report
+  .card.border-0.shadow-sm.report-table-card.mb-4
+    .card-header.bg-white.border-bottom.p-4
+      .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2
+        div
+          h5.mb-1 Employee Asset Report
+          p.text-secondary.mb-0 Review currently issued assets and their assigned employees.
+
+        span.badge.rounded-pill.text-bg-light.border.report-count-label
+          | Records: #{employeeAssetReports.length}
+
+    .card-body.p-3
+      if employeeAssetReports.length === 0
+        .text-center.py-5.px-3
+          h6.mb-2 No Issued Assets Found
+          p.text-secondary.mb-0 No currently issued assets are available for this report.
+
+      else
+        table#employeeAssetReportsTable.table.table-hover.align-middle.mb-0.w-100(style="min-width: 1100px;")
+          thead
+            tr
+              th.px-4.py-3(scope="col") Asset Code
+              th.py-3(scope="col") Make / Model
+              th.py-3(scope="col") Employee Code
+              th.py-3(scope="col") Employee Name
+              th.py-3(scope="col") Branch
+              th.py-3.pe-4(scope="col") Issue Date
+
+          tbody
+            each item in employeeAssetReports
+              tr
+                td.px-4
+                  span.report-asset-code= item.Asset ? item.Asset.assetCode : "N/A"
+
+                td
+                  strong= item.Asset ? `${item.Asset.make} ${item.Asset.model}` : "N/A"
+
+                td= item.Employee ? item.Employee.employeeCode : "N/A"
+
+                td= item.Employee ? `${item.Employee.firstName} ${item.Employee.lastName}` : "N/A"
+
+                td= item.Asset ? item.Asset.branch : "N/A"
+
+                td.pe-4= item.issueDate
+
+  // Scrap Report
+  .card.border-0.shadow-sm.report-table-card
+    .card-header.bg-white.border-bottom.p-4
+      .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2
+        div
+          h5.mb-1 Scrap Report
+          p.text-secondary.mb-0 Review scrapped assets, their purchase values, and recorded reasons.
+
+        span.badge.rounded-pill.text-bg-light.border.report-count-label
+          | Records: #{scrapReports.length}
+
+    .card-body.p-3
+      if scrapReports.length === 0
+        .text-center.py-5.px-3
+          h6.mb-2 No Scrapped Assets Found
+          p.text-secondary.mb-0 Scrapped asset records will appear here when available.
+
+      else
+        table#scrapReportsTable.table.table-hover.align-middle.mb-0.w-100(style="min-width: 1100px;")
+          thead
+            tr
+              th.px-4.py-3(scope="col") Scrap Date
+              th.py-3(scope="col") Asset Code
+              th.py-3(scope="col") Make / Model
+              th.py-3(scope="col") Branch
+              th.py-3.text-end(scope="col") Purchase Value
+              th.py-3.pe-4(scope="col") Scrap Reason
+
+          tbody
+            each item in scrapReports
+              tr
+                td.px-4= item.actionDate
+
+                td
+                  span.report-asset-code= item.Asset ? item.Asset.assetCode : "N/A"
+
+                td
+                  strong= item.Asset ? `${item.Asset.make} ${item.Asset.model}` : "N/A"
+
+                td= item.Asset ? item.Asset.branch : "N/A"
+
+                td.text-end= Number(item.Asset ? item.Asset.purchaseValue || 0 : 0).toLocaleString("en-IN", { style: "currency", currency: "INR" })
+
+                td.pe-4= item.reason || "-"
+
+block scripts
+  script.
+    $(document).ready(function () {
+      const reportTables = [
+        { id: "#branchReportsTable", order: [[0, "asc"]] },
+        { id: "#employeeAssetReportsTable", order: [[5, "desc"]] },
+        { id: "#scrapReportsTable", order: [[0, "desc"]] }
+      ];
+
+      reportTables.forEach(function (config) {
+        const table = $(config.id);
+
+        if (table.length && !$.fn.DataTable.isDataTable(table[0])) {
+          table.DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            searching: true,
+            ordering: true,
+            paging: true,
+            info: true,
+            autoWidth: false,
+            scrollX: true,
+            order: config.order,
+
+            language: {
+              search: "Search:",
+              lengthMenu: "Show _MENU_ records",
+              info: "Showing _START_ to _END_ of _TOTAL_ records",
+              infoEmpty: "No records available",
+              zeroRecords: "No matching records found",
+
+              paginate: {
+                previous: "Previous",
+                next: "Next"
+              }
+            }
+          });
+        }
+      });
+    });

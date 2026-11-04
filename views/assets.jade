@@ -1,0 +1,134 @@
+
+extends adminLayout
+
+block content
+
+  // Page Header
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      h1.mb-1 Asset Master
+      p.text-secondary.mb-0 View, search, and manage company assets.
+
+    .d-flex.flex-wrap.gap-2
+      a.btn.btn-outline-secondary.btn-back(href="/admin")
+        span(aria-hidden="true") ←
+        | Back to Dashboard
+
+      a.btn.btn-success.add-action-btn(href="/assets/add") + Add Asset
+
+  // Asset Search and Category Filter
+  .card.border-0.shadow-sm.mb-4
+    .card-body
+      form(action="/assets", method="GET")
+        .row.g-3.align-items-end
+          .col-12.col-md-5
+            label.form-label(for="search") Search Make/Model
+            input#search.form-control(
+              type="text"
+              name="search"
+              value=search
+              placeholder="Enter make or model"
+            )
+
+          .col-12.col-md-4
+            label.form-label(for="categoryId") Filter by Asset Category
+            select#categoryId.form-select(name="categoryId")
+              option(value="") All Categories
+              each category in categories
+                option(
+                  value=category.id
+                  selected=String(category.id) === String(categoryId)
+                )= category.categoryName
+
+          .col-12.col-md-3.d-flex.flex-wrap.gap-2
+            button.btn.btn-success(type="submit") Search
+            a.btn.btn-outline-secondary(href="/assets") Clear Filters
+
+  // Asset List
+  .card.border-0.shadow-sm
+    .card-header.bg-white.py-3
+      h5.mb-0 Asset List
+
+    .card-body
+      if assets.length === 0
+        .alert.alert-info.mb-0 No assets found.
+      else
+        .table-responsive
+          table#assetsTable.table.table-hover.table-striped.align-middle.mb-0
+            thead.table-dark
+              tr
+                th Asset Code
+                th Serial Number
+                th Category
+                th Make
+                th Model
+                th Branch
+                th Purchase Date
+                th Purchase Value
+                th Status
+                th Action
+
+            tbody
+              each asset in assets
+                tr
+                  td.fw-semibold= asset.assetCode
+                  td= asset.serialNumber
+                  td= asset.AssetCategory ? asset.AssetCategory.categoryName : "—"
+                  td= asset.make
+                  td= asset.model
+                  td= asset.branch
+                  td= asset.purchaseDate
+                  td= Number(asset.purchaseValue).toLocaleString("en-IN", { style: "currency", currency: "INR" })
+
+                  td
+                    if asset.status === "Available"
+                      span.badge.text-bg-success= asset.status
+                    else if asset.status === "Issued"
+                      span.badge.text-bg-primary= asset.status
+                    else if asset.status === "Under Repair"
+                      span.badge.text-bg-warning= asset.status
+                    else
+                      span.badge.text-bg-secondary= asset.status
+
+                  td
+                    a.btn.btn-sm.btn-outline-success(href="/assets/edit/" + asset.id) Edit
+
+  // DataTables Setup
+  if assets.length > 0
+    script.
+      $(document).ready(function () {
+        const table = document.getElementById("assetsTable");
+
+        if (table && !$.fn.DataTable.isDataTable(table)) {
+          $(table).DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            searching: true,
+            ordering: true,
+            paging: true,
+            info: true,
+            autoWidth: false,
+            scrollX: true,
+
+            columnDefs: [
+              {
+                orderable: false,
+                targets: 9
+              }
+            ],
+
+            language: {
+              search: "Search assets:",
+              lengthMenu: "Show _MENU_ assets",
+              info: "Showing _START_ to _END_ of _TOTAL_ assets",
+              infoEmpty: "No assets available",
+              zeroRecords: "No matching assets found",
+
+              paginate: {
+                previous: "Previous",
+                next: "Next"
+              }
+            }
+          });
+        }
+      });

@@ -1,0 +1,147 @@
+
+extends adminLayout
+
+block content
+  // Page Header
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      h1.mb-1 Asset History
+      p.text-secondary.mb-0 Track asset activity from purchase to issue, return, and scrapping.
+
+    a.btn.btn-outline-secondary.btn-back(href="/admin")
+      span(aria-hidden="true") ←
+      | Back to Dashboard
+
+  // Summary Cards
+  .row.g-3.mb-4.align-items-stretch
+
+    // Total History Records
+    .col-12.col-md-6.col-xl-4
+      .card.border-0.shadow-sm.history-summary-card.h-100
+        .card-body.p-4
+          .d-flex.justify-content-between.align-items-center.gap-3
+            div
+              p.text-secondary.mb-2 Total History Records
+              h3.mb-0= histories.length
+            .history-summary-icon
+              span(aria-hidden="true") 📋
+
+    // Total Asset Investment
+    .col-12.col-md-6.col-xl-4
+      .card.border-0.shadow-sm.history-summary-card.h-100
+        .card-body.p-4
+          p.text-secondary.mb-2 Total Asset Investment
+          h3.mb-0.text-success= "₹" + Number(totalInvestment).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          small.text-secondary Total purchase value of registered assets
+
+  // Asset History Table
+  .card.border-0.shadow-sm.history-table-card
+    .card-header.bg-white.border-bottom.p-4
+      .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+        div
+          h5.mb-1 Asset Activity Records
+          p.text-secondary.mb-0 Review recorded actions, purchase values, and reasons.
+
+        span.badge.rounded-pill.text-bg-light.border.history-count-label
+          | Total: #{histories.length}
+
+    .card-body.p-3
+      if histories.length === 0
+        .text-center.py-5.px-3
+          .history-empty-icon.mb-3
+            span(aria-hidden="true") 📋
+          h5.mb-2 No Asset History Found
+          p.text-secondary.mb-0 Asset activity records will appear here when available.
+
+      else
+        .table-responsive
+          table#assetHistoryTable.table.table-hover.align-middle.mb-0.w-100(style="min-width: 1150px;")
+            thead
+              tr
+                th.px-4.py-3(scope="col") Date
+                th.py-3(scope="col") Asset Code
+                th.py-3(scope="col") Make / Model
+                th.py-3(scope="col") Employee
+                th.py-3(scope="col") Action
+                th.py-3(scope="col") Purchase Value
+                th.py-3.pe-4(scope="col") Reason
+
+            tbody
+              each history in histories
+                tr
+                  td.px-4
+                    span.history-date= history.actionDate
+
+                  td
+                    span.history-asset-code= history.Asset ? history.Asset.assetCode : "N/A"
+
+                  td
+                    if history.Asset
+                      span.fw-semibold= `${history.Asset.make} ${history.Asset.model}`
+                    else
+                      span.text-secondary N/A
+
+                  td
+                    if history.Employee
+                      div.fw-semibold= history.Employee.employeeCode
+                      small.text-secondary= `${history.Employee.firstName} ${history.Employee.lastName}`
+                    else
+                      span.text-secondary N/A
+
+                  td
+                    if history.action === "Scrapped"
+                      span.badge.history-action-badge.bg-danger= history.action
+                    else if history.action === "Issued"
+                      span.badge.history-action-badge.bg-primary= history.action
+                    else if history.action === "Returned"
+                      span.badge.history-action-badge.bg-success= history.action
+                    else
+                      span.badge.history-action-badge.bg-secondary= history.action
+
+                  // Purchase Value
+                  td
+                    if history.Asset
+                      span.fw-semibold.text-success= "₹" + Number(history.Asset.purchaseValue).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    else
+                      span.text-secondary —
+
+                  // Reason
+                  td.pe-4
+                    if history.reason
+                      span= history.reason
+                    else
+                      span.text-secondary —
+
+block scripts
+  if histories.length > 0
+    script.
+      $(document).ready(function () {
+        const table = document.getElementById("assetHistoryTable");
+
+        if (table && !$.fn.DataTable.isDataTable(table)) {
+          $(table).DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            searching: true,
+            ordering: true,
+            paging: true,
+            info: true,
+            autoWidth: false,
+            scrollX: true,
+            order: [[0, "desc"]],
+
+            language: {
+              search: "Search history:",
+              lengthMenu: "Show _MENU_ records",
+              info: "Showing _START_ to _END_ of _TOTAL_ records",
+              infoEmpty: "No history records available",
+              zeroRecords: "No matching history records found",
+
+              paginate: {
+                previous: "Previous",
+                next: "Next"
+              }
+            }
+          });
+        }
+      });

@@ -1,0 +1,143 @@
+extends adminLayout
+
+block content
+  // Page Header
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      h1.mb-1 Asset Categories
+      
+
+    a.btn.btn-outline-secondary.btn-back(href="/admin")
+      span(aria-hidden="true") ←
+      | Back to Dashboard
+
+  // Error Message
+  if error
+    .alert.alert-danger.alert-dismissible.fade.show(role="alert")
+      strong Unable to complete the operation.
+      |  #{error}
+      button.btn-close(type="button" data-bs-dismiss="alert" aria-label="Close")
+
+  // Add Category Form
+  .card.border-0.shadow-sm.mb-4
+    .card-header.bg-white.py-3
+      .d-flex.align-items-center.gap-2
+        .category-form-icon
+          span(aria-hidden="true") +
+        div
+          h5.mb-1 Add Category
+          small.text-secondary Create a new asset category.
+
+    .card-body.p-4
+      form(action="/asset-categories/add", method="POST")
+        .row.align-items-end.g-3
+          .col-12.col-md-8
+            label.form-label(for="categoryName") Category Name
+            input#categoryName.form-control(
+              type="text"
+              name="categoryName"
+              placeholder="e.g. Laptop, Desktop, Printer"
+              required
+            )
+
+          .col-12.col-md-4
+            button.btn.btn-success.w-100(type="submit")
+              span.me-2(aria-hidden="true") +
+              | Add Category
+
+  // Existing Categories
+  .card.border-0.shadow-sm
+    .card-header.bg-white.py-3
+      .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2
+        div
+          h5.mb-1 Existing Categories
+          small.text-secondary View and update your asset categories.
+
+        span.badge.rounded-pill.text-bg-light.border.category-total
+          | Total: #{categories.length}
+
+    .card-body.p-0
+      if categories.length === 0
+        .text-center.py-5.px-3
+          .category-empty-icon.mb-3
+            span(aria-hidden="true") +
+          h6.mb-2 No Categories Found
+          p.text-secondary.mb-0 Add your first asset category using the form above.
+      else
+        .table-responsive
+          table#assetCategoriesTable.table.table-hover.align-middle.mb-0
+            thead.table-dark
+              tr
+                th.px-4(scope="col") Category ID
+                th(scope="col") Category Name
+                th.text-end.pe-4(scope="col") Action
+
+            tbody
+              each category in categories
+                tr
+                  td.px-4
+                    span.category-id= category.id
+
+                  td
+                    form.category-name-form(
+                        action="/asset-categories/edit/" + category.id
+                        method="POST"
+                      )
+                      input.form-control.category-name-input(
+                        type="text"
+                        name="categoryName"
+                        value=category.categoryName
+                        aria-label="Category name"
+                        required
+                      )
+
+                      button.btn.btn-sm.btn-outline-success(
+                        type="submit"
+                        aria-label="Update category " + category.categoryName
+                      )
+                        span.me-1(aria-hidden="true") ✓
+                        | Update
+
+                  td.text-end.pe-4
+                    span.badge.category-status Active
+
+  // DataTables Setup
+  if categories.length > 0
+    script.
+      $(document).ready(function () {
+        const table = document.getElementById("assetCategoriesTable");
+
+        if (table && !$.fn.DataTable.isDataTable(table)) {
+          $(table).DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            searching: true,
+            ordering: true,
+            paging: true,
+            info: true,
+            autoWidth: false,
+            scrollX: true,
+            order: [],
+
+            columnDefs: [
+              {
+                orderable: false,
+                targets: 2
+              }
+            ],
+
+            language: {
+              search: "Search categories:",
+              lengthMenu: "Show _MENU_ categories",
+              info: "Showing _START_ to _END_ of _TOTAL_ categories",
+              infoEmpty: "No categories available",
+              zeroRecords: "No matching categories found",
+
+              paginate: {
+                previous: "Previous",
+                next: "Next"
+              }
+            }
+          });
+        }
+      });

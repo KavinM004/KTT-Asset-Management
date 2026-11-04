@@ -1,0 +1,102 @@
+extends adminLayout
+
+block content
+  // Page Header
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      h1.mb-1 Edit Employee
+      p.text-secondary.mb-0 Update employee information and account status.
+
+    a.btn.btn-outline-secondary.btn-back(href="/employees")
+      span(aria-hidden="true") ←
+      | Back to Employee Master
+
+  // Employee Information Form
+  .card.border-0.shadow-sm
+    .card-header.bg-white.py-3
+      .d-flex.align-items-center.gap-2
+        .employee-form-icon
+          span(aria-hidden="true") ✎
+        div
+          h5.mb-1 Employee Information
+          small.text-secondary Update the employee details below.
+
+    .card-body.p-4
+      form(action="/employees/edit/" + employee.id, method="POST")
+        .row.g-4
+
+          // Employee Code
+          .col-12.col-md-6
+            label.form-label(for="employeeCode") Employee Code
+            input#employeeCode.form-control(
+              type="text"
+              name="employeeCode"
+              value=employee.employeeCode
+              placeholder="e.g. EMP003"
+              required
+            )
+
+          // Email Address
+          .col-12.col-md-6
+            label.form-label(for="email") Email Address
+            input#email.form-control(
+              type="email"
+              name="email"
+              value=employee.email
+              placeholder="employee@example.com"
+              required
+            )
+
+          // First Name
+          .col-12.col-md-6
+            label.form-label(for="firstName") First Name
+            input#firstName.form-control(
+              type="text"
+              name="firstName"
+              value=employee.firstName
+              placeholder="Enter first name"
+              required
+            )
+
+          // Last Name
+          .col-12.col-md-6
+            label.form-label(for="lastName") Last Name
+            input#lastName.form-control(
+              type="text"
+              name="lastName"
+              value=employee.lastName
+              placeholder="Enter last name"
+              required
+            )
+
+          // Department
+          .col-12.col-md-6
+            label.form-label(for="department") Department
+            input#department.form-control(
+              type="text"
+              name="department"
+              value=employee.department
+              placeholder="e.g. IT, HR, Finance"
+            )
+
+          // Employee Status
+          .col-12.col-md-6
+            label.form-label(for="status") Employee Status
+            select#status.form-select(name="status" required)
+              option(
+                value="Active"
+                selected=employee.status === "Active"
+              ) Active
+              option(
+                value="Inactive"
+                selected=employee.status === "Inactive"
+              ) Inactive
+
+        // Form Actions
+        hr.my-4
+
+        .d-flex.flex-wrap.justify-content-end.gap-2
+          a.btn.btn-light.border(href="/employees") Cancel
+          button.btn.btn-success(type="submit")
+            span.me-2(aria-hidden="true") ✓
+            | Update Employee

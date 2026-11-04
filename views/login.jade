@@ -1,0 +1,99 @@
+doctype html
+html
+  head
+    title= title || "Login | KTT Asset Management"
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="/css/style.css")
+
+  body.login-page
+    .login-container
+      .login-left
+        .login-brand
+          img.login-logo(src="/images/ktt_logo.jpg", alt="KTT Logo")
+          span KTT Asset Management
+
+        .login-welcome
+          h1 Manage Your Assets Smarter.
+          p A centralized platform to manage employees, track assets, monitor stock, and maintain complete asset history.
+
+        .login-features
+          .login-feature
+            span.feature-check ✓
+            span Employee Management
+          .login-feature
+            span.feature-check ✓
+            span Asset Tracking
+          .login-feature
+            span.feature-check ✓
+            span Reports & History
+
+        
+
+      .login-right
+        .login-form-wrapper
+          .login-mobile-brand
+            img.login-logo(src="/images/ktt_logo.jpg", alt="KTT Logo")
+
+          .login-heading
+            span.login-eyebrow SECURE ACCESS
+            h2 Welcome Back!
+            p Sign in to access your account.
+
+          if error
+            .login-error(role="alert")= error
+
+          form(action="/login", method="POST")
+            .login-field
+              label(for="email") Email Address
+              .login-input-wrapper
+                span.input-icon ✉
+                input#email(
+                  type="email",
+                  name="email",
+                  placeholder="Enter your email address",
+                  autocomplete="username",
+                  required,
+                  autofocus
+                )
+
+            .login-field
+              label(for="password") Password
+              .login-input-wrapper
+                span.input-icon 🔒
+                input#password(
+                  type="password",
+                  name="password",
+                  placeholder="Enter your password",
+                  autocomplete="current-password",
+                  required
+                )
+                button.password-toggle(
+                  type="button",
+                  id="togglePassword",
+                  aria-label="Show password",
+                  aria-pressed="false"
+                ) Show
+
+            button.login-submit(type="submit")
+              span Sign In
+              span.login-arrow →
+
+          .login-security
+            span.security-icon ✓
+            span Your login is protected by secure authentication.
+
+          p.login-footer © #{new Date().getFullYear()} KTT Asset Management
+
+    script.
+      const togglePassword = document.getElementById("togglePassword");
+      const passwordInput = document.getElementById("password");
+
+      togglePassword.addEventListener("click", function () {
+        const isPassword = passwordInput.type === "password";
+
+        passwordInput.type = isPassword ? "text" : "password";
+        togglePassword.textContent = isPassword ? "Hide" : "Show";
+        togglePassword.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+        togglePassword.setAttribute("aria-pressed", String(isPassword));
+      });

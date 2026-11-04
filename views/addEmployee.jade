@@ -1,0 +1,70 @@
+extends adminLayout
+
+block content
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      h1.mb-1 Add Employee
+      p.text-secondary.mb-0 Register a new employee in the system.
+    a.btn.btn-outline-secondary(href="/employees") Back to Employee Master
+
+  .card.border-0.shadow-sm
+    .card-header.bg-white.py-3
+      h5.mb-0 Employee Information
+    .card-body.p-4
+      form(action="/employees/add", method="POST")
+        .row.g-4
+          .col-12.col-md-6
+            label.form-label(for="employeeCode") Employee Code
+            input#employeeCode.form-control(
+              type="text"
+              name="employeeCode"
+              placeholder="e.g. EMP003"
+              required
+            )
+
+          .col-12.col-md-6
+            label.form-label(for="email") Email Address
+            input#email.form-control(
+              type="email"
+              name="email"
+              placeholder="employee@example.com"
+              required
+            )
+
+          .col-12.col-md-6
+            label.form-label(for="firstName") First Name
+            input#firstName.form-control(
+              type="text"
+              name="firstName"
+              placeholder="Enter first name"
+              required
+            )
+
+          .col-12.col-md-6
+            label.form-label(for="lastName") Last Name
+            input#lastName.form-control(
+              type="text"
+              name="lastName"
+              placeholder="Enter last name"
+              required
+            )
+
+          .col-12.col-md-6
+            label.form-label(for="department") Department
+            input#department.form-control(
+              type="text"
+              name="department"
+              placeholder="e.g. IT, HR, Finance"
+            )
+
+          .col-12.col-md-6
+            label.form-label(for="status") Employee Status
+            select#status.form-select(name="status")
+              option(value="Active" selected) Active
+              option(value="Inactive") Inactive
+
+        hr.my-4
+
+        .d-flex.flex-wrap.gap-2.justify-content-end
+          a.btn.btn-light.border(href="/employees") Cancel
+          button.btn.btn-success(type="submit") Save Employee
