@@ -46,8 +46,8 @@ router.get("/", requireLogin, requireRole("ADMIN"), async (req, res) => {
       search,
       categoryId,
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).send("Unable to load assets.");
   }
 });
@@ -128,14 +128,14 @@ router.post("/add", requireLogin, requireRole("ADMIN"), async (req, res) => {
     await dbTransaction.commit();
 
     res.redirect("/assets");
-  } catch (error) {
+  } catch (err) {
     if (!dbTransaction.finished) {
       await dbTransaction.rollback();
     }
 
-    console.error("Unable to add asset:", error);
+    console.error("Unable to add asset:", err);
 
-    if (error.name === "SequelizeUniqueConstraintError") {
+    if (err.name === "SequelizeUniqueConstraintError") {
       return res
         .status(400)
         .send("Asset code or serial number already exists.");
@@ -196,10 +196,10 @@ router.post(
       });
 
       res.redirect("/assets");
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
 
-      if (error.name === "SequelizeUniqueConstraintError") {
+      if (err.name === "SequelizeUniqueConstraintError") {
         return res
           .status(400)
           .send("Asset code or serial number already exists.");

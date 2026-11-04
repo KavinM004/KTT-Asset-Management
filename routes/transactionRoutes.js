@@ -23,8 +23,8 @@ router.get("/issue", async (req, res) => {
     });
 
     res.render("issueAsset", { assets, employees });
-  } catch (error) {
-    console.error("Unable to load Issue Asset page:", error);
+  } catch (err) {
+    console.error("Unable to load Issue Asset page:", err);
     res.status(500).send("Unable to load Issue Asset page.");
   }
 });
@@ -82,12 +82,12 @@ router.post("/issue", async (req, res) => {
     await transaction.commit();
 
     res.redirect("/transactions/issue?success=1");
-  } catch (error) {
+  } catch (err) {
     if (!transaction.finished) {
       await transaction.rollback();
     }
 
-    console.error("Unable to issue asset:", error);
+    console.error("Unable to issue asset:", err);
     res.status(500).send("Unable to issue asset. Please check the server logs.");
   }
 });
@@ -108,8 +108,8 @@ router.get("/return", async (req, res) => {
       transactions,
       success: req.query.success === "1",
     });
-  } catch (error) {
-    console.error("Unable to load Return Asset page:", error);
+  } catch (err) {
+    console.error("Unable to load Return Asset page:", err);
     res.status(500).send("Unable to load Return Asset page.");
   }
 });
@@ -181,12 +181,12 @@ router.post("/return", async (req, res) => {
     await transaction.commit();
 
     res.redirect("/transactions/return?success=1");
-  } catch (error) {
+  } catch (err) {
     if (!transaction.finished) {
       await transaction.rollback();
     }
 
-    console.error("Unable to return asset:", error);
+    console.error("Unable to return asset:", err);
     res.status(500).send("Unable to return asset. Please check the server logs.");
   }
 });
@@ -207,8 +207,8 @@ router.get("/scrap", async (req, res) => {
       assets,
       success: req.query.success === "1",
     });
-  } catch (error) {
-    console.error("Unable to load Scrap Asset page:", error);
+  } catch (err) {
+    console.error("Unable to load Scrap Asset page:", err);
     res.status(500).send("Unable to load Scrap Asset page.");
   }
 });
@@ -258,12 +258,12 @@ router.post("/scrap", async (req, res) => {
     await transaction.commit();
 
     res.redirect("/transactions/scrap?success=1");
-  } catch (error) {
+  } catch (err) {
     if (!transaction.finished) {
       await transaction.rollback();
     }
 
-    console.error("Unable to scrap asset:", error);
+    console.error("Unable to scrap asset:", err);
     res.status(500).send(
       "Unable to scrap asset. Please check the server logs."
     );

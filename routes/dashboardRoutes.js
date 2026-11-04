@@ -102,8 +102,8 @@ router.get("/user", requireLogin, requireRole("USER"), async (req, res) => {
       assetHistory,
       message: null,
     });
-  } catch (error) {
-    console.error("User Dashboard error:", error);
+  } catch (err) {
+    console.error("User Dashboard error:", err);
 
     return res.status(500).send(
       "Unable to load the User Dashboard. Please try again later."

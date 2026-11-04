@@ -28,8 +28,8 @@ router.get("/", async (req, res) => {
       histories,
       totalInvestment: totalInvestment || 0,
     });
-  } catch (error) {
-    console.error("Unable to load Asset History:", error);
+  } catch (err) {
+    console.error("Unable to load Asset History:", err);
     res.status(500).send("Unable to load Asset History.");
   }
 });

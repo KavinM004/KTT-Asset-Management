@@ -51,8 +51,8 @@ router.get("/", async (req, res) => {
       branchTotals: Object.values(branchTotals),
       totalStockValue,
     });
-  } catch (error) {
-    console.error("Stock View error:", error);
+  } catch (err) {
+    console.error("Stock View error:", err);
     res.status(500).send("Unable to load stock details.");
   }
 });
