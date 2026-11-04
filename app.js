@@ -28,6 +28,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const PORT = process.env.PORT || 5000;
+
 // Prevent browsers from caching
 app.use((req, res, next) => {
   res.setHeader(
@@ -226,8 +228,8 @@ try {
   await sessionStore.sync();
   console.log("Database tables are ready.");
 
-  app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port : ${process.env.PORT}`);
+  app.listen(PORT, () => {
+    console.log(`Server is running on port : ${PORT}`);
   });
 } catch (err) {
   console.error("Unable to connect to the database:", err);
